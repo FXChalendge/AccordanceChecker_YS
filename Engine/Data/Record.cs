@@ -10,6 +10,10 @@ namespace Engine
     public class Record
         : INormalized<double>
     {
+        #region | Fields |
+        private readonly double _widthLimit;
+        #endregion | Fields |
+
         #region | Properties |
         /// <summary>
         /// 
@@ -24,8 +28,30 @@ namespace Engine
         /// <summary>
         /// 
         /// </summary>
-        public double Normalized { get; protected set; }
+        public double? Normalized { get; protected set; }
+        /// <summary>
+        /// 
+        /// </summary>
+        public bool IsValid
+        {
+            get
+            {
+                return _widthLimit <= 0 || Width < _widthLimit;
+            }
+        }
         #endregion | Properties |
+
+        #region | Constructor |
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="widthLimit"></param>
+        /// <remarks>Set <cref="widthLimit"/> with less or equals to <c="0"/> to elliminate Width to <cref="widthLimit"/> validation.</remarks>
+        public Record(double widthLimit)
+        {
+            _widthLimit = widthLimit;
+        }
+        #endregion | Constructor |
 
         #region | Methods |
         /// <summary>
@@ -42,7 +68,7 @@ namespace Engine
         /// </summary>
         /// <param name="line"></param>
         /// <returns></returns>
-        internal static Record Deserialize(string line)
+        internal static Record Deserialize(double widthLimit, string line)
         {
             Record res = null;
 
@@ -52,7 +78,7 @@ namespace Engine
                 int widthIdx = 0;
                 if (tokens.Length > 0)
                 {
-                    res = new Record();
+                    res = new Record(widthLimit);
 
                     if (tokens.Length > 1)
                         widthIdx = 1;
@@ -72,7 +98,8 @@ namespace Engine
         /// <returns></returns>
         public INormalized<double> Normalize(double avg)
         {
-            Normalized = Width - avg;
+            if(IsValid)
+                Normalized = Width - avg;
 
             return this;
         }
@@ -82,7 +109,7 @@ namespace Engine
         /// <returns></returns>
         public override string ToString()
         {
-            return $"{nameof(Position)}:{Position};{nameof(Width)}:{Width};{nameof(Normalized)}:{Normalized}";
+            return $"{nameof(Position)}:{Position};{nameof(IsValid)}:{IsValid}(Limit:{_widthLimit});{nameof(Width)}:{Width};{nameof(Normalized)}:{Normalized}";
         }
 
         #endregion | Methods |

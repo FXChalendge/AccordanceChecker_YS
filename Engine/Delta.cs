@@ -36,7 +36,7 @@ namespace Engine
         {
             get
             {
-                if (_delta == null && First?.Data != null && Second?.Data != null)
+                if (_delta == null && First?.Data != null && Second?.Data != null && First.Data.IsValid && Second.Data.IsValid)
                     _delta = First.Data.Width - Second.Data.Width;
                 return _delta;
             }

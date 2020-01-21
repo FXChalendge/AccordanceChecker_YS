@@ -13,7 +13,7 @@ namespace Engine
         , IDisposable
     {
         #region | Fields |
-        private double _widthsSum = 0;
+        private double _validWidthsSum = 0;
         #endregion | Fields |
 
         #region | Properties |
@@ -31,6 +31,11 @@ namespace Engine
         /// 
         /// </summary>
         public int Count { get; private set; }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public int ValidRecsCount { get; private set; }
 
         /// <summary>
         /// 
@@ -62,7 +67,7 @@ namespace Engine
         /// </summary>
         /// <param name="filePath"></param>
         /// <returns></returns>
-        public static RecordsNodesCircularList Deserialize(string filePath)
+        public static RecordsNodesCircularList Deserialize(double widthLimit, string filePath)
         {
             RecordsNodesCircularList res = null;
 
@@ -71,7 +76,7 @@ namespace Engine
                 var lines = File.ReadLines(filePath);
                 foreach (var line in lines)
                 {
-                    Record r = Record.Deserialize(line);
+                    Record r = Record.Deserialize(widthLimit, line);
                     if (r != null)
                     {
                         if (res == null)
@@ -163,7 +168,13 @@ namespace Engine
                 Head.Previous = Tail;
 
                 Count++;
-                _widthsSum += item.Width;
+
+                if (item.IsValid)
+                {
+                    _validWidthsSum += item.Width;
+                    ValidRecsCount++;
+                }
+
                 IsNormalized = false;
                 IsAdjusted = false;
             }
@@ -181,12 +192,12 @@ namespace Engine
                 RecordNode rn = Head.Next;
                 rn.Previous = null;
                 Head.Next = null;
-                _widthsSum -= Head.Data.Width;
+                _validWidthsSum -= Head.Data.Width;
                 Head = null;
                 Head = rn;
             }
             Tail = null;
-            _widthsSum = 0;
+            _validWidthsSum = 0;
             IsNormalized = false;
             IsAdjusted = false;
         }
@@ -238,7 +249,7 @@ namespace Engine
 
         public INormalizable Normalize()
         {
-            double widthAvg = _widthsSum / Count;
+            double widthAvg = _validWidthsSum / ValidRecsCount;
             double normalizedWidthSum = 0;
             RecordNode iterator = Head;
 
@@ -246,7 +257,8 @@ namespace Engine
             {
                 iterator.Data.Normalize(widthAvg);
 
-                normalizedWidthSum += iterator.Data.Normalized;
+                if(iterator.Data.Normalized.HasValue)
+                    normalizedWidthSum += iterator.Data.Normalized.Value;
 
                 iterator = iterator.Next;
             }
@@ -269,10 +281,10 @@ namespace Engine
         public bool Adjust(RecordsNodesCircularList forAdjutment)
         {
             bool res = false;
-            IDictionary<RecordNode, double?> productsSums = null;
+            IDictionary<RecordNode, Tuple<double?, int>> productsSums = null;
             RecordNode headAdj = null;
 
-            double? maxProductsSum = null;
+            Tuple<double?, int> maxProductsSum = null;
             RecordNode maxAdj = null;
 
             if (!IsNormalized)
@@ -287,18 +299,19 @@ namespace Engine
                 {
                     headAdj = forAdjutment.Head;
 
-                    productsSums = new Dictionary<RecordNode, double?>();
+                    productsSums = new Dictionary<RecordNode, Tuple<double?, int>>();
 
                     do
                     {
-                        double? productsSum = GetProductsSum(headAdj);
+                        int countWasSum; //count of records were summed, due to presence of the invalid records that disqualify the record in both collections;
+                        double? productsSum = GetProductsSum(headAdj, out countWasSum);
                         if (productsSum != null)
                         {
-                            productsSums[headAdj] = productsSum;
+                            productsSums[headAdj] = new Tuple<double?, int>(productsSum, countWasSum);
 
-                            if (maxProductsSum == null || productsSum > maxProductsSum)
+                            if (maxProductsSum == null || productsSum > maxProductsSum.Item1)
                             {
-                                maxProductsSum = productsSum;
+                                maxProductsSum = productsSums[headAdj];
                                 maxAdj = headAdj;
                             }
                         }
@@ -326,8 +339,15 @@ namespace Engine
             return this;
         }
 
-        private double? GetProductsSum(RecordNode headAdj)
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="headAdj"></param>
+        /// <param name="countWasSum">The count of records were summed, due to presence of the invalid records that disqualify the record in both collections;</param>
+        /// <returns></returns>
+        private double? GetProductsSum(RecordNode headAdj, out int countWasSum)
         {
+            countWasSum = -1;
             double? res = null;
 
             if (Head != null && headAdj != null)
@@ -339,10 +359,17 @@ namespace Engine
                 {
                     double? product = iterator.GetProduct(iteratorAdj);
 
-                    if (res == null)
-                        res = product;
-                    else
-                        res += product;
+                    if (product.HasValue)
+                    {
+                        if (res == null)
+                            res = product;
+                        else
+                            res += product;
+
+                        if (countWasSum < 0)
+                            countWasSum = 0;
+                        countWasSum++;
+                    }
 
                     iterator = iterator.Next;
                     iteratorAdj = iteratorAdj.Next;

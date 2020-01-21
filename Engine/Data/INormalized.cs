@@ -4,10 +4,15 @@ using System.Text;
 
 namespace Engine
 {
-    public interface INormalized<T> where T : struct
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    public interface INormalized<T>
+        where T : struct
     {
         #region | Properties |
-        T Normalized { get; }
+        T? Normalized { get; }
         #endregion | Properties |
 
         #region | Methods |

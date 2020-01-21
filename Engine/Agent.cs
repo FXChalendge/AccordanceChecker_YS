@@ -14,6 +14,7 @@ namespace Engine
         #endregion | Classes |
 
         #region | Fields |
+        private readonly double _widthLimit;
         private RecordsNodesCircularList _base = null;
         private RecordsNodesCircularList _second = null;
         #endregion | Fields |
@@ -26,7 +27,14 @@ namespace Engine
         #endregion | Properties |
 
         #region | Constructors |
-
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="widthLimit"></param>
+        public Agent(double widthLimit)
+        {
+            _widthLimit = widthLimit;
+        }
         #endregion | Constructors |
 
         #region | Methods |
@@ -69,8 +77,8 @@ namespace Engine
         {
             string res = null;
 
-            RecordsNodesCircularList rnclFirst = RecordsNodesCircularList.Deserialize(first);
-            RecordsNodesCircularList rnclSecond = RecordsNodesCircularList.Deserialize(second);
+            RecordsNodesCircularList rnclFirst = RecordsNodesCircularList.Deserialize(_widthLimit, first);
+            RecordsNodesCircularList rnclSecond = RecordsNodesCircularList.Deserialize(_widthLimit, second);
 
             Corellate(rnclFirst, rnclSecond);
 
@@ -89,7 +97,7 @@ namespace Engine
         /// <param name="first"></param>
         /// <param name="second"></param>
         /// <param name="percentile">desiered percental rank (in range 0...1)</param>
-        /// <returns></returns>
+        /// <remarks>Set <cref="percentile"/> with less to <c="0"/> to elliminate selection by percentile rank.</remarks>
         private double Accordance(RecordsNodesCircularList first, RecordsNodesCircularList second, double percentile)
         {
             double res = 0;
@@ -124,10 +132,14 @@ namespace Engine
             if (PercentRank(deltasSorted))
             {
                 int endIndx = deltasSorted.Count;
-                int i = 0;
-                for (; i < endIndx && deltasSorted.ElementAt(i).PercentRank.Value < percentile; i++)
-                { }
-                endIndx = i;
+
+                if (percentile >= 0)
+                {
+                    int i = 0;
+                    for (; i < endIndx && deltasSorted.ElementAt(i).PercentRank.HasValue && deltasSorted.ElementAt(i).PercentRank.Value < percentile; i++)
+                    { }
+                    endIndx = i;
+                }
                 res = deltasSorted.StandardDeviation(0, endIndx);
             }
             return res;

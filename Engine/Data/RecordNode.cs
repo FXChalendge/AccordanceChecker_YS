@@ -40,7 +40,7 @@ namespace Engine
         /// <returns></returns>
         public double? GetProduct(RecordNode other)
         {
-            return other == null ? (double?)null : Data.Normalized * other.Data.Normalized;
+            return !Data.IsValid || other == null || !other.Data.IsValid ? (double?)null : Data.Normalized * other.Data.Normalized;
         }
         #endregion | Methods |
     }
