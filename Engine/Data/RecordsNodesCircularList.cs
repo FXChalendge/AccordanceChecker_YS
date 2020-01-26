@@ -200,6 +200,9 @@ namespace Engine
             _validWidthsSum = 0;
             IsNormalized = false;
             IsAdjusted = false;
+            Count = 0;
+            ValidRecsCount = 0;
+            Head = null;
         }
 
         public bool Contains(Record item)
