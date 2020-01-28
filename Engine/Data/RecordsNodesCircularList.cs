@@ -6,10 +6,10 @@ using System.Text;
 
 namespace Engine
 {
-    public class RecordsNodesCircularList
-        : IList<Record>
+    public class RecordsNodesCircularList<TPosition>
+        : IList<Record<TPosition>>
         , INormalizable
-        , IAdjustable<RecordsNodesCircularList>
+        , IAdjustable<RecordsNodesCircularList<TPosition>>
         , IDisposable
     {
         #region | Fields |
@@ -20,12 +20,12 @@ namespace Engine
         /// <summary>
         /// 
         /// </summary>
-        public RecordNode Head { get; set; }
+        public RecordNode<Record<TPosition>> Head { get; set; }
 
         /// <summary>
         /// 
         /// </summary>
-        public RecordNode Tail { get; set; }
+        public RecordNode<Record<TPosition>> Tail { get; set; }
 
         /// <summary>
         /// 
@@ -57,7 +57,7 @@ namespace Engine
         /// </summary>
         /// <param name="index"></param>
         /// <returns></returns>
-        Record IList<Record>.this[int index] { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+        Record<TPosition> IList<Record<TPosition>>.this[int index] { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
         #endregion | Properties |
 
         #region | Methods |
@@ -67,20 +67,20 @@ namespace Engine
         /// </summary>
         /// <param name="filePath"></param>
         /// <returns></returns>
-        public static RecordsNodesCircularList Deserialize(double widthLimit, string filePath)
+        public static RecordsNodesCircularList<TPosition> Deserialize(double widthLimit, string filePath)
         {
-            RecordsNodesCircularList res = null;
+            RecordsNodesCircularList<TPosition> res = null;
 
             if (!string.IsNullOrEmpty(filePath))
             {
                 var lines = File.ReadLines(filePath);
                 foreach (var line in lines)
                 {
-                    Record r = Record.Deserialize(widthLimit, line);
+                    Record<TPosition> r = Record<TPosition>.Deserialize(widthLimit, line);
                     if (r != null)
                     {
                         if (res == null)
-                            res = new RecordsNodesCircularList();
+                            res = new RecordsNodesCircularList<TPosition>();
                         res.Add(r);
                     }
                 }
@@ -96,7 +96,7 @@ namespace Engine
         /// <param name="rnclFirst"></param>
         /// <param name="rnclSecond"></param>
         /// <returns></returns>
-        public static string Serialize(string destFilePath, RecordsNodesCircularList rnclFirst, RecordsNodesCircularList rnclSecond)
+        public static string Serialize(string destFilePath, RecordsNodesCircularList<TPosition> rnclFirst, RecordsNodesCircularList<TPosition> rnclSecond)
         {
             string res = null;
 
@@ -113,7 +113,7 @@ namespace Engine
             return res;
         }
 
-        private static string[] Serialize(RecordsNodesCircularList rnclFirst, RecordsNodesCircularList rnclSecond)
+        private static string[] Serialize(RecordsNodesCircularList<TPosition> rnclFirst, RecordsNodesCircularList<TPosition> rnclSecond)
         {
             string[] res = null;
             if ( rnclFirst == null || rnclSecond == null)
@@ -121,8 +121,8 @@ namespace Engine
 
             List<string> lines = new List<string>();
 
-            RecordNode iteratorFirst = rnclFirst.Head;
-            RecordNode iteratorSecond = rnclSecond.Head;
+            RecordNode<Record<TPosition>> iteratorFirst = rnclFirst.Head;
+            RecordNode<Record<TPosition>> iteratorSecond = rnclSecond.Head;
 
             lines.Add("Position,FirstRun,SecondRun");
 
@@ -145,11 +145,11 @@ namespace Engine
         /// 
         /// </summary>
         /// <param name="item"></param>
-        public void Add(Record item)
+        public void Add(Record<TPosition> item)
         {
             if (item != null)
             {
-                RecordNode rn = new RecordNode { Data = item };
+                RecordNode<Record<TPosition>> rn = new RecordNode<Record<TPosition>> { Data = item };
                 if (Head == null)
                 {
                     Head = rn;
@@ -189,7 +189,7 @@ namespace Engine
                     Tail.Next = null;
                     Head.Previous = null;
                 }
-                RecordNode rn = Head.Next;
+                RecordNode<Record<TPosition>> rn = Head.Next;
                 rn.Previous = null;
                 Head.Next = null;
                 _validWidthsSum -= Head.Data.Width;
@@ -205,32 +205,32 @@ namespace Engine
             Head = null;
         }
 
-        public bool Contains(Record item)
+        public bool Contains(Record<TPosition> item)
         {
             throw new NotImplementedException();
         }
 
-        public void CopyTo(Record[] array, int arrayIndex)
+        public void CopyTo(Record<TPosition>[] array, int arrayIndex)
         {
             throw new NotImplementedException();
         }
 
-        public IEnumerator<RecordNode> GetEnumerator()
+        public IEnumerator<RecordNode<Record<TPosition>>> GetEnumerator()
         {
             throw new NotImplementedException();
         }
 
-        public int IndexOf(Record item)
+        public int IndexOf(Record<TPosition> item)
         {
             throw new NotImplementedException();
         }
 
-        public void Insert(int index, Record item)
+        public void Insert(int index, Record<TPosition> item)
         {
             throw new NotImplementedException();
         }
 
-        public bool Remove(Record item)
+        public bool Remove(Record<TPosition> item)
         {
             throw new NotImplementedException();
         }
@@ -245,7 +245,7 @@ namespace Engine
             throw new NotImplementedException();
         }
 
-        IEnumerator<Record> IEnumerable<Record>.GetEnumerator()
+        IEnumerator<Record<TPosition>> IEnumerable<Record<TPosition>>.GetEnumerator()
         {
             throw new NotImplementedException();
         }
@@ -254,7 +254,7 @@ namespace Engine
         {
             double widthAvg = _validWidthsSum / ValidRecsCount;
             double normalizedWidthSum = 0;
-            RecordNode iterator = Head;
+            RecordNode<Record<TPosition>> iterator = Head;
 
             do
             {
@@ -281,14 +281,14 @@ namespace Engine
         /// </summary>
         /// <param name="forAdjutment"></param>
         /// <returns>True if <cref="forAdjutment"/> adjusted with this list, otherwise - false;</returns>
-        public bool Adjust(RecordsNodesCircularList forAdjutment)
+        public bool Adjust(RecordsNodesCircularList<TPosition> forAdjutment)
         {
             bool res = false;
-            IDictionary<RecordNode, Tuple<double?, int>> productsSums = null;
-            RecordNode headAdj = null;
+            IDictionary<RecordNode<Record<TPosition>>, Tuple<double?, int>> productsSums = null;
+            RecordNode<Record<TPosition>> headAdj = null;
 
             Tuple<double?, int> maxProductsSum = null;
-            RecordNode maxAdj = null;
+            RecordNode<Record<TPosition>> maxAdj = null;
 
             if (!IsNormalized)
                 Normalize();
@@ -302,7 +302,7 @@ namespace Engine
                 {
                     headAdj = forAdjutment.Head;
 
-                    productsSums = new Dictionary<RecordNode, Tuple<double?, int>>();
+                    productsSums = new Dictionary<RecordNode<Record<TPosition>>, Tuple<double?, int>>();
 
                     do
                     {
@@ -332,7 +332,7 @@ namespace Engine
             return res;
         }
 
-        private RecordsNodesCircularList Shift(RecordNode maxAdj)
+        private RecordsNodesCircularList<TPosition> Shift(RecordNode<Record<TPosition>> maxAdj)
         {
             Head = maxAdj;
             Tail = maxAdj.Previous;
@@ -348,15 +348,15 @@ namespace Engine
         /// <param name="headAdj"></param>
         /// <param name="countWasSum">The count of records were summed, due to presence of the invalid records that disqualify the record in both collections;</param>
         /// <returns></returns>
-        private double? GetProductsSum(RecordNode headAdj, out int countWasSum)
+        private double? GetProductsSum(RecordNode<Record<TPosition>> headAdj, out int countWasSum)
         {
             countWasSum = -1;
             double? res = null;
 
             if (Head != null && headAdj != null)
             {
-                RecordNode iterator = Head;
-                RecordNode iteratorAdj = headAdj;
+                RecordNode<Record<TPosition>> iterator = Head;
+                RecordNode<Record<TPosition>> iteratorAdj = headAdj;
 
                 do
                 {

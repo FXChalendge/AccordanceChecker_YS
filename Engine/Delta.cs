@@ -4,9 +4,9 @@ using System.Text;
 
 namespace Engine
 {
-    public class Delta
-        : IComparer<Delta>
-        , IComparable<Delta>
+    public class Delta<TPosition>
+        : IComparer<Delta<TPosition>>
+        , IComparable<Delta<TPosition>>
     {
         #region | Fields |
         private double? _delta = null;
@@ -16,7 +16,7 @@ namespace Engine
         /// <summary>
         /// 
         /// </summary>
-        public RecordNode First
+        public RecordNode<Record<TPosition>> First
         {
             get;
             private set;
@@ -24,7 +24,7 @@ namespace Engine
         /// <summary>
         /// 
         /// </summary>
-        public RecordNode Second
+        public RecordNode<Record<TPosition>> Second
         {
             get;
             private set;
@@ -53,7 +53,7 @@ namespace Engine
         /// </summary>
         /// <param name="first"></param>
         /// <param name="second"></param>
-        public Delta(RecordNode first, RecordNode second)
+        public Delta(RecordNode<Record<TPosition>> first, RecordNode<Record<TPosition>> second)
         {
             First = first;
             Second = second;
@@ -67,7 +67,7 @@ namespace Engine
         /// <param name="x"></param>
         /// <param name="y"></param>
         /// <returns></returns>
-        public int Compare(Delta x, Delta y)
+        public int Compare(Delta<TPosition> x, Delta<TPosition> y)
         {
             return x.CompareTo(y);
         }
@@ -76,7 +76,7 @@ namespace Engine
         /// </summary>
         /// <param name="other"></param>
         /// <returns></returns>
-        public int CompareTo(Delta other)
+        public int CompareTo(Delta<TPosition> other)
         {
             int res = 0;
             if (Value != null && other?.Value != null)

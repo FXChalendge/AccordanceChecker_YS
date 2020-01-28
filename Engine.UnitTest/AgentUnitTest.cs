@@ -16,8 +16,8 @@ namespace Engine.UnitTest
 
         private int _selCase = 1;
 
-        private RecordsNodesCircularList _rnclBase = null;
-        private RecordsNodesCircularList _rnclToAdjust = null;
+        private RecordsNodesCircularList<int> _rnclBase = null;
+        private RecordsNodesCircularList<int> _rnclToAdjust = null;
         #endregion | Fields |
 
         #region | Properties |
@@ -26,14 +26,14 @@ namespace Engine.UnitTest
         [TestInitialize]
         public void Init()
         {
-            _rnclBase = new RecordsNodesCircularList();
-            _rnclToAdjust = new RecordsNodesCircularList();
+            _rnclBase = new RecordsNodesCircularList<int>();
+            _rnclToAdjust = new RecordsNodesCircularList<int>();
 
             for (int i = 0; i < QTY; i++)
             {
-                _rnclBase.Add(new Record(WIDTH_LIMIT[_selCase]) { Position = i, Width = i / 10.0 + i % 3 });
+                _rnclBase.Add(new Record<int>(WIDTH_LIMIT[_selCase]) { Position = i, Width = i / 10.0 + i % 3 });
                 int shiftedPos = (i + SHIFT) % QTY;
-                _rnclToAdjust.Add(new Record(WIDTH_LIMIT[_selCase]) { Position = shiftedPos, Width = shiftedPos + i / 10.0 + i % 3 });
+                _rnclToAdjust.Add(new Record<int>(WIDTH_LIMIT[_selCase]) { Position = shiftedPos, Width = shiftedPos + i / 10.0 + i % 3 });
             }
             Assert.IsTrue(_rnclBase.Count == QTY, "wromg quantity (base list)");
             Assert.IsTrue(_rnclToAdjust.Count == QTY, "wromg quantity (toAdjust list");
@@ -51,7 +51,7 @@ namespace Engine.UnitTest
         [TestMethod]
         public void Correlate_Test()
         {
-            Agent agnt = new Agent(WIDTH_LIMIT[_selCase]);
+            Agent<int> agnt = new Agent<int>(WIDTH_LIMIT[_selCase]);
             agnt.Corellate(_rnclBase, _rnclToAdjust);
             Assert.IsTrue(agnt.IsCorrelated, "correlation failed");
         }
@@ -60,13 +60,37 @@ namespace Engine.UnitTest
         public void Accordance_Test()
         {
             double maxPecentileRank = 0.9;
-            Agent agnt = new Agent(WIDTH_LIMIT[_selCase]);
+            Agent<int> agnt = new Agent<int>(WIDTH_LIMIT[_selCase]);
             agnt.Corellate(_rnclBase, _rnclToAdjust);
             Assert.IsTrue(agnt.IsCorrelated, "correlation failed");
 
             double stdev = agnt.Accordance(maxPecentileRank);
 
             Assert.AreEqual<double>(EXPECTED_ACCORDANCE[_selCase], stdev, "Accordance failed");
+        }
+
+        [TestMethod]
+        public void Accordance_4Dani_Test()
+        {
+            double[] basic = { 1, 3, 5, 7, 9 };
+            double[] adjust = {  3.3, 5.1, 6.8, 8.6, 0.96 };
+            _rnclBase.Clear();
+            _rnclToAdjust.Clear();
+
+            for (int i = 0; i < basic.Length; i++)
+            {
+                _rnclBase.Add(new Record<int>(WIDTH_LIMIT[0]) { Position = i, Width = basic[i] });
+                _rnclToAdjust.Add(new Record<int>(WIDTH_LIMIT[0]) { Position = i, Width = adjust[i] });
+            }
+
+            double maxPecentileRank = 0.8;
+            Agent<int> agnt = new Agent<int>(WIDTH_LIMIT[_selCase]);
+            agnt.Corellate(_rnclBase, _rnclToAdjust);
+            Assert.IsTrue(agnt.IsCorrelated, "correlation failed");
+
+            double stdev = agnt.Accordance(maxPecentileRank);
+
+            Assert.AreEqual<double>(0.18384776310850232, stdev, "Accordance failed");
         }
     }
 }

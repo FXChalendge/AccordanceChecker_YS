@@ -7,7 +7,7 @@ namespace Engine
     /// <summary>
     /// 
     /// </summary>
-    public class Agent
+    public class Agent<TPosition>
     {
         #region | Classes |
 
@@ -15,8 +15,8 @@ namespace Engine
 
         #region | Fields |
         private readonly double _widthLimit;
-        private RecordsNodesCircularList _base = null;
-        private RecordsNodesCircularList _second = null;
+        private RecordsNodesCircularList<TPosition> _base = null;
+        private RecordsNodesCircularList<TPosition> _second = null;
         #endregion | Fields |
 
         #region | Properties |
@@ -44,7 +44,7 @@ namespace Engine
         /// <param name="first"></param>
         /// <param name="second"></param>
         /// <returns></returns>
-        public void Corellate(RecordsNodesCircularList first, RecordsNodesCircularList second)
+        public void Corellate(RecordsNodesCircularList<TPosition> first, RecordsNodesCircularList<TPosition> second)
         {
             if (first == null || second == null)
             {
@@ -77,14 +77,14 @@ namespace Engine
         {
             string res = null;
 
-            RecordsNodesCircularList rnclFirst = RecordsNodesCircularList.Deserialize(_widthLimit, first);
-            RecordsNodesCircularList rnclSecond = RecordsNodesCircularList.Deserialize(_widthLimit, second);
+            RecordsNodesCircularList<TPosition> rnclFirst = RecordsNodesCircularList<TPosition>.Deserialize(_widthLimit, first);
+            RecordsNodesCircularList<TPosition> rnclSecond = RecordsNodesCircularList<TPosition>.Deserialize(_widthLimit, second);
 
             Corellate(rnclFirst, rnclSecond);
 
             if(rnclSecond.IsAdjusted)
             {
-                RecordsNodesCircularList.Serialize(first, rnclFirst, rnclSecond);
+                RecordsNodesCircularList<TPosition>.Serialize(first, rnclFirst, rnclSecond);
                 res = first;
             }
 
@@ -98,30 +98,30 @@ namespace Engine
         /// <param name="second"></param>
         /// <param name="percentile">desiered percental rank (in range 0...1)</param>
         /// <remarks>Set <cref="percentile"/> with less to <c="0"/> to elliminate selection by percentile rank.</remarks>
-        private double Accordance(RecordsNodesCircularList first, RecordsNodesCircularList second, double percentile)
+        private double Accordance(RecordsNodesCircularList<TPosition> first, RecordsNodesCircularList<TPosition> second, double percentile)
         {
             double res = 0;
 
             if (!IsCorrelated)
                 throw new Exception("Accodance terminated! Launch 'Correlate(...)' method first and then try again. CAUSE: Records collactions are NOT correlated yet.");
 
-            RecordNode itrtrFirst = first.Head;
-            RecordNode itrtrSecond = second.Head;
+            RecordNode<Record<TPosition>> itrtrFirst = first.Head;
+            RecordNode<Record<TPosition>> itrtrSecond = second.Head;
 
-            Delta delta = null;
-            List<Delta> deltas = null;
-            List<Delta> deltasSorted = null;
+            Delta<TPosition> delta = null;
+            List<Delta<TPosition>> deltas = null;
+            List<Delta<TPosition>> deltasSorted = null;
 
             do
             {
-                delta = new Delta(itrtrFirst, itrtrSecond);
+                delta = new Delta<TPosition>(itrtrFirst, itrtrSecond);
 
                 if (deltas == null)
-                    deltas = new List<Delta>();
+                    deltas = new List<Delta<TPosition>>();
                 deltas.Add(delta);
 
                 if (deltasSorted == null)
-                    deltasSorted = new List<Delta>();
+                    deltasSorted = new List<Delta<TPosition>>();
                 deltasSorted.Add(delta);
 
                 itrtrFirst = itrtrFirst.Next;
@@ -159,7 +159,7 @@ namespace Engine
             return res;
         }
 
-        private bool PercentRank(List<Delta> deltasCollection)
+        private bool PercentRank(List<Delta<TPosition>> deltasCollection)
         {
             bool res = false;
 
@@ -183,12 +183,12 @@ namespace Engine
             return res;
         }
 
-        private double PercentRank(Delta delta, List<Delta> deltasCollection)
+        private double PercentRank(Delta<TPosition> delta, List<Delta<TPosition>> deltasCollection)
         {
             return delta.PercentRank != null ? delta.PercentRank.Value : PercentRank(deltasCollection, delta.Value.Value);
         }
 
-        private double PercentRank(List<Delta> deltasCollection, double value)
+        private double PercentRank(List<Delta<TPosition>> deltasCollection, double value)
         {
             double? res = null;
 

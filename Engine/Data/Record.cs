@@ -7,8 +7,9 @@ namespace Engine
     /// <summary>
     /// 
     /// </summary>
-    public class Record
+    public class Record<T>
         : INormalized<double>
+        , IProduct<Record<T>>
     {
         #region | Fields |
         private readonly double _widthLimit;
@@ -18,7 +19,7 @@ namespace Engine
         /// <summary>
         /// 
         /// </summary>
-        public int Position { get; set; }
+        public T Position { get; set; }
 
         /// <summary>
         /// 
@@ -60,7 +61,7 @@ namespace Engine
         /// <returns></returns>
         internal string Serialize()
         {
-            return $"{Position},{Width}";
+            return $"{Position}:{Width}";
         }
 
         /// <summary>
@@ -68,9 +69,9 @@ namespace Engine
         /// </summary>
         /// <param name="line"></param>
         /// <returns></returns>
-        internal static Record Deserialize(double widthLimit, string line)
+        internal static Record<T> Deserialize(double widthLimit, string line)
         {
-            Record res = null;
+            Record<T> res = null;
 
             if (!string.IsNullOrEmpty(line))
             {
@@ -78,7 +79,7 @@ namespace Engine
                 int widthIdx = 0;
                 if (tokens.Length > 0)
                 {
-                    res = new Record(widthLimit);
+                    res = new Record<T>(widthLimit);
 
                     if (tokens.Length > 1)
                         widthIdx = 1;
@@ -86,7 +87,7 @@ namespace Engine
                     res.Width = Double.Parse(tokens[widthIdx]);
 
                     if (widthIdx > 0)
-                        res.Position = Int32.Parse(tokens[0]);
+                        res.Position = (T)Convert.ChangeType(tokens[0], typeof(T));
                 }
             }
             return res;
@@ -103,6 +104,16 @@ namespace Engine
 
             return this;
         }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="other"></param>
+        /// <returns></returns>
+        public double? GetProduct(Record<T> other)
+        {
+            return !IsValid || other == null || !other.IsValid ? (double?)null : Normalized * other.Normalized;
+        }
         /// <summary>
         /// 
         /// </summary>
@@ -111,7 +122,6 @@ namespace Engine
         {
             return $"{nameof(Position)}:{Position};{nameof(IsValid)}:{IsValid}(Limit:{_widthLimit});{nameof(Width)}:{Width};{nameof(Normalized)}:{Normalized}";
         }
-
         #endregion | Methods |
     }
 }

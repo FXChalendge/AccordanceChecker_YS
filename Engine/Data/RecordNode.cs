@@ -4,23 +4,23 @@ using System.Text;
 
 namespace Engine
 {
-    public class RecordNode
+    public class RecordNode<T>
     {
         #region | Properties |
         /// <summary>
         /// 
         /// </summary>
-        public Record Data { get; set; }
+        public T Data { get; set; }
 
         /// <summary>
         /// 
         /// </summary>
-        public RecordNode Previous { get; set; }
+        public RecordNode<T> Previous { get; set; }
 
         /// <summary>
         /// 
         /// </summary>
-        public RecordNode Next { get; set; }
+        public RecordNode<T> Next { get; set; }
         #endregion | Properties |
 
         #region | Methods |
@@ -38,9 +38,9 @@ namespace Engine
         /// </summary>
         /// <param name="other"></param>
         /// <returns></returns>
-        public double? GetProduct(RecordNode other)
+        public double? GetProduct(RecordNode<T> other)
         {
-            return !Data.IsValid || other == null || !other.Data.IsValid ? (double?)null : Data.Normalized * other.Data.Normalized;
+            return (Data as IProduct<T>)?.GetProduct(other.Data);
         }
         #endregion | Methods |
     }

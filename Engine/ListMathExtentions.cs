@@ -15,7 +15,7 @@ namespace Engine
         /// </summary>
         /// <param name="values"></param>
         /// <returns></returns>
-        public static double Mean(this List<Delta> values)
+        public static double Mean<TPosition>(this List<Delta<TPosition>> values)
         {
             return values.Count == 0 ? 0 : values.Mean(0, values.Count);
         }
@@ -26,7 +26,7 @@ namespace Engine
         /// <param name="start"></param>
         /// <param name="end"></param>
         /// <returns></returns>
-        public static double Mean(this List<Delta> values, int start, int end)
+        public static double Mean<TPosition>(this List<Delta<TPosition>> values, int start, int end)
         {
             double s = 0;
 
@@ -43,7 +43,7 @@ namespace Engine
         /// </summary>
         /// <param name="values"></param>
         /// <returns></returns>
-        public static double Variance(this List<Delta> values)
+        public static double Variance<TPosition>(this List<Delta<TPosition>> values)
         {
             return values.Variance(values.Mean(), 0, values.Count);
         }
@@ -53,7 +53,7 @@ namespace Engine
         /// <param name="values"></param>
         /// <param name="mean"></param>
         /// <returns></returns>
-        public static double Variance(this List<Delta> values, double mean)
+        public static double Variance<TPosition>(this List<Delta<TPosition>> values, double mean)
         {
             return values.Variance(mean, 0, values.Count);
         }
@@ -65,7 +65,7 @@ namespace Engine
         /// <param name="start"></param>
         /// <param name="end"></param>
         /// <returns></returns>
-        public static double Variance(this List<Delta> values, double mean, int start, int end)
+        public static double Variance<TPosition>(this List<Delta<TPosition>> values, double mean, int start, int end)
         {
             double variance = 0;
 
@@ -85,7 +85,7 @@ namespace Engine
         /// </summary>
         /// <param name="values"></param>
         /// <returns></returns>
-        public static double StandardDeviation(this List<Delta> values)
+        public static double StandardDeviation<TPosition>(this List<Delta<TPosition>> values)
         {
             return values.Count == 0 ? 0 : values.StandardDeviation(0, values.Count);
         }
@@ -96,7 +96,7 @@ namespace Engine
         /// <param name="start"></param>
         /// <param name="end"></param>
         /// <returns></returns>
-        public static double StandardDeviation(this List<Delta> values, int start, int end)
+        public static double StandardDeviation<TPosition>(this List<Delta<TPosition>> values, int start, int end)
         {
             double mean = values.Mean(start, end);
             double variance = values.Variance(mean, start, end);

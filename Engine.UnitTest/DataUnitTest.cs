@@ -23,8 +23,8 @@ namespace Engine.UnitTest
         [TestMethod]
         public void AddRecord_First_Test()
         {
-            RecordsNodesCircularList rncl = new RecordsNodesCircularList();
-            rncl.Add(new Record(WIDTH_LIMIT) { Position = 0, Width = 0.1 });
+            RecordsNodesCircularList<int> rncl = new RecordsNodesCircularList<int>();
+            rncl.Add(new Record<int>(WIDTH_LIMIT) { Position = 0, Width = 0.1 });
 
             Assert.IsTrue(rncl.Count == 1, "wromg quantity");
 
@@ -35,10 +35,10 @@ namespace Engine.UnitTest
         [TestMethod]
         public void AddRecords_Multiple_Test()
         {
-            RecordsNodesCircularList rncl = new RecordsNodesCircularList();
+            RecordsNodesCircularList<int> rncl = new RecordsNodesCircularList<int>();
             for (int i = 0; i < QTY; i++)
             {
-                rncl.Add(new Record(WIDTH_LIMIT) { Position = i, Width = i / 10.0 });
+                rncl.Add(new Record<int>(WIDTH_LIMIT) { Position = i, Width = i / 10.0 });
             }
             Assert.IsTrue(rncl.Count == QTY, "wromg quantity");
 
@@ -57,10 +57,10 @@ namespace Engine.UnitTest
         [TestMethod]
         public void Normalization_Test()
         {
-            RecordsNodesCircularList rncl = new RecordsNodesCircularList();
+            RecordsNodesCircularList<int> rncl = new RecordsNodesCircularList<int>();
             for (int i = 0; i < QTY; i++)
             {
-                rncl.Add(new Record(WIDTH_LIMIT) { Position = i, Width = i / 10.0 });
+                rncl.Add(new Record<int>(WIDTH_LIMIT) { Position = i, Width = i / 10.0 });
             }
             Assert.IsTrue(rncl.Count == QTY, "wromg quantity");
 
@@ -81,13 +81,13 @@ namespace Engine.UnitTest
         [TestMethod]
         public void Adjustment_Test()
         {
-            RecordsNodesCircularList rnclBase = new RecordsNodesCircularList();
-            RecordsNodesCircularList rnclToAdjust = new RecordsNodesCircularList();
+            RecordsNodesCircularList<int> rnclBase = new RecordsNodesCircularList<int>();
+            RecordsNodesCircularList<int> rnclToAdjust = new RecordsNodesCircularList<int>();
             for (int i = 0; i < QTY; i++)
             {
-                rnclBase.Add(new Record(WIDTH_LIMIT) { Position = i, Width = i / 10.0 });
+                rnclBase.Add(new Record<int>(WIDTH_LIMIT) { Position = i, Width = i / 10.0 });
                 int shiftedPos = (i + SHIFT) % QTY;
-                rnclToAdjust.Add(new Record(WIDTH_LIMIT) { Position = shiftedPos, Width = shiftedPos / 10.0 });
+                rnclToAdjust.Add(new Record<int>(WIDTH_LIMIT) { Position = shiftedPos, Width = shiftedPos / 10.0 });
             }
             Assert.IsTrue(rnclBase.Count == QTY, "wromg quantity (base list)");
             Assert.IsTrue(rnclToAdjust.Count == QTY, "wromg quantity (toAdjust list");
