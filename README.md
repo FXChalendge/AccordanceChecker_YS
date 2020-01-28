@@ -1,5 +1,5 @@
 [![GitHub last commit (branch)](https://img.shields.io/github/last-commit/FXChalendge/AccordanceChecker_YS)](https://fxchalendge.github.io/AccordanceChecker_YS)
-[![.NET Core]((https://github.com/FXChalendge/AccordanceChecker_YS/workflows/Build%20and%20run%20Tests%20on%20.NET%20Core/badge.svg))](https://github.com/FXChalendge/AccordanceChecker_YS/actions)
+[![.NET Core](https://github.com/FXChalendge/AccordanceChecker_YS/workflows/Build%20and%20run%20Tests%20on%20.NET%20Core/badge.svg)](https://github.com/FXChalendge/AccordanceChecker_YS/actions)
 [![Contributor Covenant](https://img.shields.io/badge/Contributor%20Covenant-v2.0%20adopted-ff69b4.svg)](CODE_OF_CONDUCT.md)
 
 
