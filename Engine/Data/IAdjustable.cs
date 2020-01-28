@@ -4,7 +4,7 @@ using System.Text;
 
 namespace Engine
 {
-    public interface IAdjustable<T> where T : RecordsNodesCircularList
+    public interface IAdjustable<T>// where T : RecordsNodesCircularList<TPosition>
     {
         #region | Properties |
         bool IsAdjusted { get; }
