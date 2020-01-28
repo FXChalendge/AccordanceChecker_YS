@@ -19,5 +19,3 @@ jobs:
         dotnet-version: 2.2.108
     - name: Build with dotnet core
       run: dotnet build --configuration Release
-    - name: Build with dotnet core
-      run: dotnet biuld --configuration Debug
